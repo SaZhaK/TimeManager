@@ -1,1 +1,1 @@
-web: java $JAVA_OPTS -cp target/classes:target/dependency/* Application.Starter
+web: java $JAVA_OPTS -cp target/classes:target/dependency/* Application.Starter --spring.profiles.active=prod
