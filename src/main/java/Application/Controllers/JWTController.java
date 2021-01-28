@@ -2,6 +2,7 @@ package Application.Controllers;
 
 import Application.Security.JWTProvider;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,6 +29,8 @@ public class JWTController {
             String password = receivedDataJson.getString("password");
 
             token = JWTProvider.generateToken(login, password);
+        } catch (JSONException e) {
+            log.error("json exception error: {}", e.getMessage());
         } catch (IOException e) {
             log.error("io exception error: {}", e.getMessage());
         }
