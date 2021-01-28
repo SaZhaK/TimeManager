@@ -31,7 +31,6 @@ public class JWTController {
         } catch (IOException e) {
             log.error("io exception error: {}", e.getMessage());
         }
-        System.out.println(JWTProvider.getLogin(token));
 
         return token;
     }
