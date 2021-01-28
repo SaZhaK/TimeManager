@@ -22,7 +22,13 @@ public class HWController {
             }
 
             JSONObject receivedDataJson = new JSONObject(data.toString());
-            log.info(receivedDataJson.getString("hello"));
+
+            int day = receivedDataJson.getInt("day");
+            JSONObject timeManager = receivedDataJson.getJSONObject("timeManager");
+            String text = timeManager.getString("text");
+
+            log.info("Day " + day);
+            log.info("Time manager " + text);
 
             responseJson.put("status", "success");
         } catch (Exception e) {
