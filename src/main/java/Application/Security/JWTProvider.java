@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -16,8 +15,10 @@ public class JWTProvider {
     private static final String JWT_SECRET = "J3Q011DbM6ogZrlZMzFB38Mh2jXTeBXnBRc76mi83dH0MjxzcORnmlo4F0RjVASS";
     private static final String KEY = TextCodec.BASE64.encode(JWT_SECRET);
 
-    public static String generateToken(String login, String password) {
-        String id = UUID.randomUUID().toString().replace("-", "");
+    public static String generateToken(long id, String login, String password) {
+        if (login == null || password == null || id < 0) {
+            throw new IllegalArgumentException("wrong parameters for token generation");
+        }
 
         Date now = new Date();
 
@@ -26,7 +27,7 @@ public class JWTProvider {
         claims.put("password", password);
 
         return Jwts.builder()
-                .setId(id)
+                .setId(String.valueOf(id))
                 .setIssuedAt(now)
                 .setNotBefore(now)
                 .setClaims(claims)
@@ -37,6 +38,10 @@ public class JWTProvider {
     }
 
     public static boolean validateToken(String token) {
+        if (token == null) {
+            throw new IllegalArgumentException("can not validate null token");
+        }
+
         try {
             Jwts.parser()
                     .setSigningKey(KEY)
@@ -56,7 +61,24 @@ public class JWTProvider {
         return false;
     }
 
+    public static long getId(String token) {
+        if (token == null) {
+            throw new IllegalArgumentException("can not get id from null token");
+        }
+
+        Claims claims = Jwts.parser()
+                .setSigningKey(KEY)
+                .parseClaimsJws(token)
+                .getBody();
+
+        return Long.parseLong(claims.getId());
+    }
+
     public static String getLogin(String token) {
+        if (token == null) {
+            throw new IllegalArgumentException("can not get login from null token");
+        }
+
         Claims claims = Jwts.parser()
                 .setSigningKey(KEY)
                 .parseClaimsJws(token)
@@ -66,6 +88,10 @@ public class JWTProvider {
     }
 
     public static String getPassword(String token) {
+        if (token == null) {
+            throw new IllegalArgumentException("can not get password from null token");
+        }
+
         Claims claims = Jwts.parser()
                 .setSigningKey(KEY)
                 .parseClaimsJws(token)
