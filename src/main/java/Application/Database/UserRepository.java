@@ -5,7 +5,11 @@ import com.sun.istack.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Service;
+
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 
 @Service
 public class UserRepository {
@@ -27,11 +31,19 @@ public class UserRepository {
         return user;
     };
 
-    public void createUser(@NotNull String login, @NotNull String password) {
-        jdbc.update("INSERT INTO users (login, password) VALUES (?,?)",
-                login,
-                password);
+    public User createUser(@NotNull String login, @NotNull String password) {
+        GeneratedKeyHolder holder = new GeneratedKeyHolder();
+        jdbc.update(con -> {
+            PreparedStatement statement = con.prepareStatement("INSERT INTO users (login, password) VALUES (?,?)",
+                    Statement.RETURN_GENERATED_KEYS);
+            statement.setString(1, login);
+            statement.setString(2, password);
+            return statement;
+        }, holder);
 
+        long id = holder.getKey().longValue();
+
+        return new User(id, login, password);
     }
 
     public User findUserByLoginAndPassword(@NotNull String login, @NotNull String password) {
