@@ -102,6 +102,6 @@ public class UserController {
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.setLocation(URI.create("https://holidaytodo.herokuapp.com/login"));
         responseHeaders.set("Authorization", "Bearer " + token);
-        return new ResponseEntity<>(responseHeaders, HttpStatus.CREATED);
+        return new ResponseEntity<>(responseHeaders, HttpStatus.OK);
     }
 }

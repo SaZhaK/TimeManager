@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.Optional;
 
 /**
@@ -38,12 +39,12 @@ public class UserService {
      * @throws IllegalArgumentException   if login or data were null
      */
     public void createUser(String login, String password) throws UserAlreadyExistsException {
-        if (userRepository.findUserByLoginAndPassword(login, password) != null) {
-            log.info("User already exists");
-            throw new UserAlreadyExistsException(login, password);
-        }
-
         if (login != null && password != null) {
+            if (userRepository.findUserByLoginAndPassword(login, password) != null) {
+                log.info("User already exists");
+                throw new UserAlreadyExistsException(login, password);
+            }
+
             User user = userRepository.createUser(login, password);
             UserCache.cacheUser(user);
         } else {
@@ -65,7 +66,8 @@ public class UserService {
      */
     public User findUserByLoginAndPassword(String login, String password) throws UserNotFoundException {
         if (login != null && password != null) {
-            Optional<User> userOptional = Optional.ofNullable(userRepository.findUserByLoginAndPassword(login, password));
+            Optional<User> userOptional = Optional.ofNullable(
+                    userRepository.findUserByLoginAndPassword(login, password));
             if (userOptional.isPresent()) {
                 User user = userOptional.get();
                 UserCache.cacheUser(user);
@@ -109,5 +111,35 @@ public class UserService {
             log.error("Incorrect id " + id);
             throw new IllegalArgumentException();
         }
+    }
+
+    /**
+     * Deletes user with given id from database and cache if present
+     * Deleting process is guaranteed to be successful if no exceptions were thrown from this method
+     *
+     * @param id - user id
+     * @throws UserNotFoundException    containing requested id if ResultSet returned by query for user with such id was empty
+     * @throws IllegalArgumentException if id was negative or zero
+     */
+    public void deleteUser(long id) throws UserNotFoundException {
+        if (id >= 0) {
+            if (userRepository.deleteUserById(id)) {
+                UserCache.removeUser(id);
+                log.info("User with id " + id + " was deleted");
+            } else {
+                log.info("User with id " + id + " not found");
+                throw new UserNotFoundException(id);
+            }
+        } else {
+            log.error("Incorrect id " + id);
+            throw new IllegalArgumentException();
+        }
+    }
+
+    /**
+     * Returns all users from database
+     */
+    public Collection<User> getAllUsers() {
+        return userRepository.getAllUsers();
     }
 }

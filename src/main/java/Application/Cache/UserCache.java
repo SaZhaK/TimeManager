@@ -3,9 +3,11 @@ package Application.Cache;
 import Application.Entities.User;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 public class UserCache {
 
     private static final int MAX_CACHE_SIZE = 5;
@@ -28,5 +30,9 @@ public class UserCache {
         }
 
         cache.put(user.getId(), user);
+    }
+
+    public static void removeUser(long id) {
+        cache.invalidate(id);
     }
 }

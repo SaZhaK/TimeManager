@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.Collection;
 
 @Service
 public class UserRepository {
@@ -46,6 +47,14 @@ public class UserRepository {
         return new User(id, login, password);
     }
 
+    public Collection<User> getAllUsers() {
+        return jdbc.query("SELECT * FROM users", (resultSet, rowNum) -> new User(
+                resultSet.getLong("id"),
+                resultSet.getString("login"),
+                resultSet.getString("password"))
+        );
+    }
+
     public User findUserByLoginAndPassword(@NotNull String login, @NotNull String password) {
         return jdbc.query("SELECT id, login, password FROM users WHERE login=? and password=?",
                 USER_MAPPER,
@@ -57,5 +66,10 @@ public class UserRepository {
         return jdbc.query("SELECT id, login, password FROM users WHERE id =?",
                 USER_MAPPER,
                 id);
+    }
+
+    public boolean deleteUserById(long id) {
+        int result = jdbc.update("DELETE FROM users WHERE id=?", id);
+        return result != 0;
     }
 }
