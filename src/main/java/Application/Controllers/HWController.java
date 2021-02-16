@@ -1,5 +1,6 @@
 package Application.Controllers;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 public class HWController {
 
+    @Hidden
     @PostMapping("/hw")
     public String helloWorld(HttpServletRequest request) {
         JSONObject responseJson = new JSONObject();

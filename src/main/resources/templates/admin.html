@@ -16,11 +16,15 @@
         <th>Id</th>
         <th>login</th>
         <th>Password</th>
+        <th>Delete user</th>
     </tr>
     <tr th:each="user : ${users}">
         <td th:text="${user.id}"></td>
         <td th:text="${user.login}"></td>
         <td th:text="${user.password}"></td>
+        <td> <form method="POST" th:action="|/admin/deleteUser/${user.id}|">
+            <button type="submit"> Delete user </button>
+        </form> </td>
     </tr>
 </table>
 
